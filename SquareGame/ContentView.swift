@@ -13,10 +13,11 @@ struct ContentView: View {
             Text("Square Game")
                 .font(.title)
                 .bold()
+                .padding()
               Text("PICK COLOURS TO MATCH THE SQUARES")
-            
+                .padding(.bottom,600)
         }
-        .padding()
+        
     }
 }
 
