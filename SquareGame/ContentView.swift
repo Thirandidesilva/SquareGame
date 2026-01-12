@@ -35,10 +35,11 @@ struct ContentView: View {
                 .font(.largeTitle)
                 .bold()
               Text(message)
-                .font(.title3)
+                .font(.title2)
                 .foregroundStyle(Color.blue)
                 .multilineTextAlignment(.center)
                 .frame(height:60)
+        
             
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 15) {
                 ForEach(0..<9) { index in
@@ -56,6 +57,7 @@ struct ContentView: View {
                 .scaleEffect(selectedIndices.contains(index) ? 0.95 : 1.0).opacity(matched[index] ? 0.5 : 1.0)
             }
             .disabled(matched[index])
+
         }
         }
                 HStack(spacing: 15) {
@@ -76,7 +78,7 @@ struct ContentView: View {
                             )
                             .cornerRadius(12)
                             .shadow(radius: 5)
-                    } // END: Button label
+                    }
                     .disabled(selectedIndices.isEmpty)
                     .opacity(selectedIndices.isEmpty ? 0.5 : 1.0)
                     Button {
@@ -100,7 +102,7 @@ struct ContentView: View {
                     
                 }
         }
-        .padding()
+        .padding(.bottom,100)
         
     }
     
@@ -131,10 +133,10 @@ struct ContentView: View {
             return
         }
         
-        // Get the color name of the first selected item
+        // Getting the color name of the first selected item
         let targetColor = items[selectedIndices[0]].name
         
-        // Check if all selected items are the same color
+        // Checking if all selected items are the same color
         let allSameColor = selectedIndices.allSatisfy { items[$0].name == targetColor }
         
         if !allSameColor {
