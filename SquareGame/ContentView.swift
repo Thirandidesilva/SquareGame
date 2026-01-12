@@ -40,9 +40,67 @@ struct ContentView: View {
                 .multilineTextAlignment(.center)
                 .frame(height:60)
             
-        
-                
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 15) {
+                ForEach(0..<9) { index in
+                Button {
+                handleTap(index)
+                } label: {
+                    
+                Rectangle()
+                .foregroundColor(items[index].color)
+                .frame(width: 100, height: 100)
+                .cornerRadius(12)
+                .overlay(RoundedRectangle(cornerRadius: 12)
+                .stroke(matched[index] ? Color.black :selectedIndices.contains(index) ? Color.blue : Color.clear,lineWidth: 6))
+                .shadow(color: matched[index] ? .black.opacity(0.6) :selectedIndices.contains(index) ? .blue.opacity(0.8) : .clear,radius: matched[index] ? 15 : selectedIndices.contains(index) ? 10 : 0)
+                .scaleEffect(selectedIndices.contains(index) ? 0.95 : 1.0).opacity(matched[index] ? 0.5 : 1.0)
+            }
+            .disabled(matched[index])
         }
+        }
+                HStack(spacing: 15) {
+                    Button {
+                        checkMatch()
+                    } label: {
+                        Text("Check Match")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                LinearGradient(
+                                    colors: [Color.green, Color(red: 0.3, green: 0.8, blue: 0.5)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .cornerRadius(12)
+                            .shadow(radius: 5)
+                    } // END: Button label
+                    .disabled(selectedIndices.isEmpty)
+                    .opacity(selectedIndices.isEmpty ? 0.5 : 1.0)
+                    Button {
+                        resetGame()
+                    } label: {
+                        Text("Reset Game")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                LinearGradient(
+                                    colors: [Color.purple, Color.blue],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .cornerRadius(12)
+                            .shadow(radius: 5)
+                    }
+                    
+                }
+        }
+        .padding()
         
     }
     
