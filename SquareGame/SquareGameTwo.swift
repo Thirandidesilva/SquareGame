@@ -78,8 +78,8 @@ struct LevelSelectionView: View {
             
             Text("Select Difficulty Level")
                 .font(.title2)
-                .foregroundColor(.gray)
-            
+                .foregroundColor(.blue)
+                
             // Level Buttons VStack
             VStack(spacing: 20) {
                 
@@ -166,9 +166,11 @@ struct LevelSelectionView: View {
                 
             }
             .padding(.horizontal, 40)
+            .padding(.top,60)
             
         }
-        .padding()
+        .padding(.top,50)
+        Spacer()
         
     }
 }
