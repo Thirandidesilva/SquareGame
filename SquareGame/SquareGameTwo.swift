@@ -204,177 +204,147 @@ struct GameView: View {
     ]
     
     var body: some View {
-        // FIXED: Check if items is empty before rendering
+        
         if items.isEmpty {
-            // Show loading or initialize
-            Color.clear
-                .onAppear {
-                    setupGame()
-                }
-        } else {
-            // FIXED: Using GeometryReader instead of UIScreen.main
-            GeometryReader { geometry in
-                // ===== START: VStack =====
-                VStack(spacing: 20) {
+        // Show loading or initialize
+        Color.clear
+            .onAppear {
+                setupGame()
+            }
+    } else {
+        
+        GeometryReader { geometry in
+            VStack(spacing: 20) {
                     
-                    // ===== START: Header HStack =====
+            HStack {
+                    // Back Button
+            Button {
+                showLevelSelection = true
+                } label: {
                     HStack {
-                        // Back Button
-                        Button {
-                            showLevelSelection = true
-                        } label: {
-                            HStack {
-                                Image(systemName: "chevron.left")
-                                Text("Levels")
-                            }
-                            .foregroundColor(.blue)
-                        }
+                    Image(systemName: "chevron.left")
+                    Text("Levels")
+                    }
+                    .foregroundColor(.blue)
+                    }
                         
-                        Spacer()
+                    Spacer()
                         
-                        // Level Title
-                        Text(level.title)
-                            .font(.headline)
-                            .foregroundColor(.gray)
+                    Text(level.title)
+                        .font(.headline)
+                        .foregroundColor(.gray)
                     }
                     .padding(.horizontal)
-                    // ===== END: Header HStack =====
-                    
-                    // Title
+                
                     Text("Tap Matching Colors")
                         .font(.largeTitle)
                         .bold()
                     
-                    // Message
                     Text(message)
                         .font(.title3)
                         .foregroundColor(.blue)
                         .multilineTextAlignment(.center)
                         .frame(height: 60)
                     
-                    // ===== START: ScrollView (for larger grids) =====
-                    ScrollView {
-                        
-                        // ===== START: LazyVGrid =====
-                        LazyVGrid(
-                            columns: Array(repeating: GridItem(.flexible()), count: level.gridSize),
-                            spacing: 10
-                        ) {
+            ScrollView {
+            LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible()), count: level.gridSize),
+                            spacing: 10) {
                             
-                            // ===== START: ForEach =====
-                            ForEach(0..<level.totalTiles, id: \.self) { index in
+    
+        ForEach(0..<level.totalTiles, id: \.self) { index in
                                 
-                                // ===== START: Button =====
-                                Button {
-                                    handleTap(index)
-                                } label: {
-                                    
-                                    // ===== START: Rectangle =====
-                                    Rectangle()
-                                        .foregroundColor(items[index].color)
-                                        .frame(
-                                            width: getTileSize(screenWidth: geometry.size.width),
-                                            height: getTileSize(screenWidth: geometry.size.width)
-                                        )
-                                        .cornerRadius(8)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(
-                                                    matched[index] ? Color.black :
-                                                    selectedIndices.contains(index) ? Color.blue : Color.clear,
-                                                    lineWidth: 4
-                                                )
-                                        )
-                                        .shadow(
-                                            color: matched[index] ? .black.opacity(0.6) :
-                                                   selectedIndices.contains(index) ? .blue.opacity(0.8) : .clear,
-                                            radius: matched[index] ? 10 : selectedIndices.contains(index) ? 8 : 0
-                                        )
-                                        .scaleEffect(selectedIndices.contains(index) ? 0.95 : 1.0)
-                                        .opacity(matched[index] ? 0.5 : 1.0)
-                                    // ===== END: Rectangle =====
-                                    
-                                } // END: Button label
-                                .disabled(matched[index])
-                                // ===== END: Button =====
                                 
-                            } // END: ForEach
-                            // ===== END: ForEach =====
+        Button {
+         handleTap(index)
+        } label: {
+                                    
+                                    
+        Rectangle()
+        .foregroundColor(items[index].color)
+        .frame(width: getTileSize(screenWidth: geometry.size.width),
+            height: getTileSize(screenWidth: geometry.size.width))
+        .cornerRadius(8)
+        .overlay(RoundedRectangle(cornerRadius: 8)
+        .stroke(matched[index] ? Color.black :selectedIndices.contains(index) ? Color.blue : Color.clear,lineWidth: 4))
+        .shadow(color: matched[index] ? .black.opacity(0.6) :
+        selectedIndices.contains(index) ? .blue.opacity(0.8) : .clear,radius: matched[index] ? 10 : selectedIndices.contains(index) ? 8 : 0)
+        .scaleEffect(selectedIndices.contains(index) ? 0.95 : 1.0)
+        .opacity(matched[index] ? 0.5 : 1.0)
+                                
+          }
+        .disabled(matched[index])
                             
-                        } // END: LazyVGrid
-                        .padding(.horizontal)
-                        // ===== END: LazyVGrid =====
+       }
                         
-                    } // END: ScrollView
-                    // ===== END: ScrollView =====
+    }
+     .padding(.horizontal)
+                        
+}
                     
-                    // ===== START: Bottom Buttons HStack =====
-                    HStack(spacing: 15) {
+                    
+                
+        HStack(spacing: 15) {
                         
-                        // Check Match Button
-                        Button {
-                            checkMatch()
-                        } label: {
-                            Text("Check Match")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(
-                                    LinearGradient(
-                                        colors: [Color.green, Color(red: 0.3, green: 0.8, blue: 0.5)],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .cornerRadius(12)
-                                .shadow(radius: 5)
-                        }
-                        .disabled(selectedIndices.isEmpty)
-                        .opacity(selectedIndices.isEmpty ? 0.5 : 1.0)
+        // Check Match Button
+            Button {
+                checkMatch()
+                  } label: {
+                    Text("Check Match")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(
+                     LinearGradient(
+                    colors: [Color.green, Color(red: 0.3,green: 0.8, blue: 0.5)],
+                        startPoint: .leading,
+                        endPoint: .trailing))
+                    .cornerRadius(12)
+                    .shadow(radius: 5)
+                    }
+                    .disabled(selectedIndices.isEmpty)
+                    .opacity(selectedIndices.isEmpty ? 0.5 : 1.0)
                         
                         // Reset Button
-                        Button {
-                            setupGame()
-                        } label: {
-                            Text("Reset")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(
-                                    LinearGradient(
-                                        colors: [Color.purple, Color.blue],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .cornerRadius(12)
-                                .shadow(radius: 5)
-                        }
-                        
-                    } // END: Bottom Buttons HStack
-                    .padding(.horizontal)
-                    // ===== END: Bottom Buttons HStack =====
-                    
-                } // END: VStack
+            Button {
+                 setupGame()
+                 } label: {
+                 Text("Reset")
+                 .font(.headline)
+                 .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
                 .padding()
-                // ===== END: VStack =====
-            } // END: GeometryReader
+                .background(
+                LinearGradient(
+                colors: [Color.purple, Color.blue],
+                startPoint: .leading,
+                endPoint: .trailing))
+                .cornerRadius(12)
+                .shadow(radius: 5)
+                  }
+                        
+                 }
+                .padding(.horizontal)
+                
+              }
+                .padding()
+            
+            }
         }
     }
     
-    // ===== START: getTileSize function =====
-    // FIXED: Now takes screenWidth as a parameter from GeometryReader
+    // getTileSize function
+    
     func getTileSize(screenWidth: CGFloat) -> CGFloat {
         let spacing: CGFloat = 10
         let padding: CGFloat = 40
         let availableWidth = screenWidth - padding - (spacing * CGFloat(level.gridSize - 1))
         return availableWidth / CGFloat(level.gridSize)
     }
-    // ===== END: getTileSize function =====
     
-    // ===== START: setupGame function =====
+    
+    // setupGame function
     func setupGame() {
         var gameItems: [NamedColors] = []
         
@@ -382,11 +352,11 @@ struct GameView: View {
         let numColors: Int
         switch level {
         case .easy:
-            numColors = 3  // 3 colors for 9 tiles (3,3,3)
+            numColors = 3
         case .medium:
-            numColors = 5  // 5 colors for 25 tiles (5,5,5,5,5)
+            numColors = 5
         case .hard:
-            numColors = 7  // 7 colors for 49 tiles (7,7,7,7,7,7,7)
+            numColors = 7
         }
         
         // Create tiles with equal distribution
@@ -404,9 +374,9 @@ struct GameView: View {
         selectedIndices.removeAll()
         message = "Tap all matching colors!"
     }
-    // ===== END: setupGame function =====
     
-    // ===== START: handleTap function =====
+    
+    // handleTap function
     func handleTap(_ index: Int) {
         if matched[index] { return }
         
@@ -426,9 +396,9 @@ struct GameView: View {
             message = "\(selectedIndices.count) selected. Tap 'Check Match' to verify!"
         }
     }
-    // ===== END: handleTap function =====
     
-    // ===== START: checkMatch function =====
+    
+    // checkMatch function
     func checkMatch() {
         if selectedIndices.isEmpty {
             message = "Please select some colors first!"
@@ -442,7 +412,7 @@ struct GameView: View {
         let allSameColor = selectedIndices.allSatisfy { items[$0].colorName == targetColor }
         
         if !allSameColor {
-            message = "❌ Not all the same color! Try again!"
+            message = "Not all the same color! Try again!"
             selectedIndices.removeAll()
             return
         }
@@ -455,21 +425,21 @@ struct GameView: View {
             for index in selectedIndices {
                 matched[index] = true
             }
-            message = "🎉 You recognized all \(targetColor)s! 🎉"
+            message = "You recognized all \(targetColor)s!"
             selectedIndices.removeAll()
             
             // Check if game is complete
             if matched.allSatisfy({ $0 }) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    message = "🎊 You won! All colors matched! 🎊"
+                    message = " You won! All colors matched!"
                 }
             }
         } else {
-            message = "❌ You found \(selectedIndices.count) but there are \(totalOfThisColor) \(targetColor)(s)! Find them all!"
+            message = "You found \(selectedIndices.count) but there are \(totalOfThisColor) \(targetColor)(s)! Find them all!"
             selectedIndices.removeAll()
         }
     }
-    // ===== END: checkMatch function =====
+
 }
 
 #Preview {
