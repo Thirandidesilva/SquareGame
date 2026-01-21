@@ -175,9 +175,9 @@ struct MainMenuView: View {
                 // Title
                 VStack(spacing: 10) {
                     Text("Color Matching")
-                        .font(.largeTitle)
+                        .font(.system(size:40, weight: .semibold))
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundColor(.yellow)
                     
                     Text("60 Second Rush")
                         .font(.system(size: 25, weight: .bold))
@@ -190,7 +190,7 @@ struct MainMenuView: View {
                     .font(.headline)
                     .foregroundColor(.purple)
                     .padding()
-                    .background(Color.white.opacity(0.9))
+                    .background(Color.white.opacity(0.95))
                     .cornerRadius(20)
                 
                 Spacer()
@@ -270,6 +270,7 @@ struct MainMenuView: View {
                 .background(Color.white.opacity(0.9))
                 .cornerRadius(20)
                 .padding(.horizontal, 60)
+                
                 
                 Spacer()
             }
