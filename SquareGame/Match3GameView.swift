@@ -111,7 +111,7 @@ class RecordManager: ObservableObject {
 
 struct Match3GameView: View {
     @StateObject private var recordManager = RecordManager()
-    @State private var activeScreen: GameScreen = .mainMenu
+    @State private var activeScreen: GameScreen = .leaderboard  // change this to .mainMenu
     
     enum GameScreen {
         case mainMenu
@@ -324,48 +324,39 @@ struct LeaderboardView: View {
             
             VStack(spacing: 20) {
                 // Header
-                HStack {
-                    Button {
-                        onReturnHome()
-                    } label: {
-                        HStack {
-                            Image(systemName: "house.fill")
-                            Text("Home")
-                        }
-                        .font(.headline)
-                        .foregroundColor(.purple)
-                        .padding()
-                        .background(Color.purple.opacity(0.2))
-                        .cornerRadius(15)
-                    }
-                    
-                    Spacer()
-                    
-                    HStack {
+                ZStack {
+                    // Center title
+                    HStack(spacing: 8) {
                         Image(systemName: "trophy.fill")
+                            .font(.system(size: 25))
                             .foregroundColor(.yellow)
+                            
                         Text("High Scores")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(.black)
                     }
-                    
-                    Spacer()
-                    
-                    // Invisible button for balance
-                    Button {} label: {
-                        HStack {
+
+                    // Left button
+                    HStack {
+                        Button {
+                            onReturnHome()
+                        } label: {
                             Image(systemName: "house.fill")
-                            Text("Home")
+                                .font(.system(size: 25))
+                                .foregroundColor(.purple)
+                                .padding(10)
+                                .background(Color.white)
+                                .cornerRadius(12)
                         }
-                        .font(.headline)
+                        Spacer()
                     }
-                    .hidden()
                 }
                 .padding()
-                .background(Color.white)
-                .cornerRadius(25)
+                .background(Color.white.opacity(0.9))
+                .cornerRadius(20)
                 .padding(.horizontal)
+
                 
                 // Records List
                 let topRecords = recordManager.getTopRecords()
