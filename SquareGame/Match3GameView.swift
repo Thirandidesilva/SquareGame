@@ -418,13 +418,13 @@ struct RecordRowView: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-                .frame(width: 70, height: 70)
+                .frame(width: 50, height: 50)
                 .cornerRadius(15)
                 
                 if position < 3 {
                     VStack {
                         Image(systemName: "trophy.fill")
-                            .font(.system(size: 30))
+                            .font(.system(size: 20))
                             .foregroundColor(.white)
                         Text("#\(position + 1)")
                             .font(.caption)
@@ -433,7 +433,7 @@ struct RecordRowView: View {
                     }
                 } else {
                     Text("#\(position + 1)")
-                        .font(.system(size: 28, weight: .black))
+                        .font(.system(size: 20, weight: .black))
                         .foregroundColor(.white)
                 }
             }
@@ -444,7 +444,7 @@ struct RecordRowView: View {
                     Image(systemName: "star.fill")
                         .foregroundColor(.yellow)
                     Text("\(record.finalScore)")
-                        .font(.system(size: 35, weight: .black))
+                        .font(.system(size: 25, weight: .black))
                         .foregroundColor(.purple)
                     Text("points")
                         .foregroundColor(.gray)
@@ -460,7 +460,7 @@ struct RecordRowView: View {
             // Medal for top 3
             if position < 3 {
                 Text(position == 0 ? "🥇" : position == 1 ? "🥈" : "🥉")
-                    .font(.system(size: 45))
+                    .font(.system(size: 40))
             }
         }
         .padding()
