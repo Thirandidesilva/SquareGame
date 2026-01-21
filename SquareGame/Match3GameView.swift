@@ -1,8 +1,8 @@
 //
 //  Match3GameView.swift
-//  Match3Game
+//  SquareGame
 //
-//  Created by User on 2026-01-21.
+//  Created by Thirandi De Silva on 2026-01-21.
 //
 
 import SwiftUI
@@ -174,19 +174,19 @@ struct MainMenuView: View {
                 
                 // Title
                 VStack(spacing: 10) {
-                    Text("Match 3")
-                        .font(.system(size: 70, weight: .black))
+                    Text("Color Matching")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
                         .foregroundColor(.white)
-                        .shadow(radius: 10)
                     
                     Text("60 Second Rush")
-                        .font(.system(size: 30, weight: .bold))
+                        .font(.system(size: 25, weight: .bold))
                         .foregroundColor(.yellow)
                         .shadow(radius: 5)
                 }
                 
                 // Subtitle
-                Text("⏱️ 60 Seconds • Max Score Challenge!")
+                Text("60 Seconds Max Score Challenge!")
                     .font(.headline)
                     .foregroundColor(.purple)
                     .padding()
@@ -203,13 +203,13 @@ struct MainMenuView: View {
                     } label: {
                         HStack(spacing: 15) {
                             Image(systemName: "bolt.fill")
-                                .font(.system(size: 30))
+                                .font(.system(size: 25))
                             Text("START")
-                                .font(.system(size: 35, weight: .black))
+                                .font(.system(size: 25, weight: .black))
                         }
                         .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 25)
+                        .frame(maxWidth: 320)
+                        .padding(.vertical, 16)
                         .background(
                             LinearGradient(
                                 colors: [Color.yellow, Color.orange],
@@ -232,34 +232,33 @@ struct MainMenuView: View {
                                 .font(.system(size: 22, weight: .bold))
                         }
                         .foregroundColor(.purple)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
+                        .frame(maxWidth: 320)
+                        .padding(.vertical, 16)
                         .background(Color.white)
                         .cornerRadius(25)
                         .shadow(radius: 10)
                     }
                 }
-                .padding(.horizontal, 30)
+                .padding(.horizontal, 50)
                 
                 // Instructions
                 VStack(spacing: 10) {
-                    Text("How to Play:")
+                    Text("How to Play ")
                         .font(.headline)
                         .foregroundColor(.purple)
                     
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Text("🎯")
                             Text("Match 3 or more tiles in a row")
                                 .font(.subheadline)
                         }
                         HStack {
-                            Text("⚡")
+            
                             Text("Score as many points as possible")
                                 .font(.subheadline)
                         }
                         HStack {
-                            Text("⏰")
+                        
                             Text("You have 60 seconds!")
                                 .font(.subheadline)
                         }
@@ -269,7 +268,7 @@ struct MainMenuView: View {
                 .padding()
                 .background(Color.white.opacity(0.9))
                 .cornerRadius(20)
-                .padding(.horizontal, 30)
+                .padding(.horizontal, 60)
                 
                 Spacer()
             }
@@ -290,7 +289,7 @@ struct IconBox: View {
                 .shadow(radius: 10)
             
             Image(systemName: icon)
-                .font(.system(size: 40))
+                .font(.system(size: 35))
                 .foregroundColor(.white)
         }
         .offset(y: -10)
