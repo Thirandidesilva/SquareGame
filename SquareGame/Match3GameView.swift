@@ -523,9 +523,9 @@ struct GameplayView: View {
                                 Image(systemName: "house.fill")
                                     .font(.title2)
                                     .foregroundColor(.white)
-                                    .padding()
+                                    .padding(8)
                                     .background(Color.purple)
-                                    .cornerRadius(15)
+                                    .cornerRadius(12)
                             }
                             
                             Spacer()
@@ -538,13 +538,14 @@ struct GameplayView: View {
                                     .font(.system(size: 24, weight: .black, design: .monospaced))
                                     .foregroundColor(.white)
                             }
-                            .padding()
+                            .padding(.vertical,8)
+                            .padding(.horizontal,12)
                             .background(
                                 countdown <= 10
                                     ? LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing)
                                     : LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
                             )
-                            .cornerRadius(20)
+                            .cornerRadius(14)
                             .shadow(radius: 5)
                             
                             Spacer()
@@ -555,9 +556,9 @@ struct GameplayView: View {
                                 Image(systemName: "arrow.clockwise")
                                     .font(.title2)
                                     .foregroundColor(.white)
-                                    .padding()
+                                    .padding(8)
                                     .background(Color.orange)
-                                    .cornerRadius(15)
+                                    .cornerRadius(12)
                             }
                         }
                         
@@ -575,7 +576,7 @@ struct GameplayView: View {
                                             ? LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing)
                                             : LinearGradient(colors: [.green, .blue], startPoint: .leading, endPoint: .trailing)
                                     )
-                                    .frame(width: geo.size.width * CGFloat(countdown / TIME_LIMIT), height: 12)
+                                    .frame(width: geo.size.width * CGFloat(countdown / TIME_LIMIT), height: 8)
                                     .cornerRadius(6)
                             }
                         }
@@ -585,15 +586,16 @@ struct GameplayView: View {
                         HStack {
                             Image(systemName: "star.fill")
                                 .foregroundColor(.yellow)
-                                .font(.system(size: 30))
+                                .font(.system(size: 25))
                             Text("\(playerScore)")
-                                .font(.system(size: 40, weight: .black))
+                                .font(.system(size: 30, weight: .black))
                                 .foregroundColor(.orange)
                             Text("POINTS")
                                 .font(.headline)
                                 .foregroundColor(.orange)
                         }
-                        .padding()
+                        .padding(.vertical,8)
+                        .padding(.horizontal,12)
                         .background(
                             LinearGradient(
                                 colors: [Color.yellow.opacity(0.3), Color.orange.opacity(0.3)],
@@ -601,13 +603,14 @@ struct GameplayView: View {
                                 endPoint: .trailing
                             )
                         )
-                        .cornerRadius(20)
+                        .cornerRadius(14)
                         
                         // Feedback Text
                         Text(feedbackText)
                             .font(.headline)
                             .foregroundColor(.purple)
-                            .padding()
+                            .padding(.vertical,6)
+                            .padding(.horizontal,12)
                             .frame(maxWidth: .infinity)
                             .background(Color.purple.opacity(0.2))
                             .cornerRadius(15)
@@ -617,11 +620,13 @@ struct GameplayView: View {
                     .cornerRadius(25)
                     .padding(.horizontal)
                     
+                    .padding(.top, 20)
+                
                     // Game Board
                     if !gameBoard.isEmpty {
-                        VStack(spacing: 12) {
+                        VStack(spacing: 15) {
                             ForEach(0..<BOARD_SIZE, id: \.self) { row in
-                                HStack(spacing: 12) {
+                                HStack(spacing: 15) {
                                     ForEach(0..<BOARD_SIZE, id: \.self) { col in
                                         if let tile = gameBoard.first(where: { $0.row == row && $0.col == col }) {
                                             TileView(
@@ -633,6 +638,7 @@ struct GameplayView: View {
                                     }
                                 }
                             }
+                            .frame(maxWidth: geometry.size.width - 32)
                         }
                         .padding()
                         .background(Color.white)
