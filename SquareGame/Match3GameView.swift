@@ -111,7 +111,7 @@ class RecordManager: ObservableObject {
 
 struct Match3GameView: View {
     @StateObject private var recordManager = RecordManager()
-    @State private var activeScreen: GameScreen = .leaderboard  // change this to .mainMenu
+    @State private var activeScreen: GameScreen = .mainMenu  // change this to .mainMenu
     
     enum GameScreen {
         case mainMenu
@@ -195,6 +195,7 @@ struct MainMenuView: View {
                 
                 Spacer()
                 
+
                 // Buttons
                 VStack(spacing: 20) {
                     // Start Button
@@ -642,6 +643,7 @@ struct GameplayView: View {
                 }
                 .onAppear {
                     startNewGame()
+                   
                 }
                 
                 // Game Over Overlay
@@ -891,18 +893,19 @@ struct GameOverDialog: View {
             ZStack {
                 Circle()
                     .fill(Color.white)
-                    .frame(width: 130, height: 130)
+                    .frame(width: 90, height: 90)
                     .shadow(radius: 20)
                 
                 Image(systemName: "trophy.fill")
-                    .font(.system(size: 70))
+                    .font(.system(size: 48))
                     .foregroundColor(.yellow)
             }
             
             // Title
             VStack(spacing: 10) {
                 Text("TIME'S UP!")
-                    .font(.system(size: 50, weight: .black))
+                    .font(.title)
+                    .fontWeight(.black)
                     .foregroundColor(.white)
                 
                 Text("Great Job!")
@@ -924,7 +927,7 @@ struct GameOverDialog: View {
                         .foregroundColor(.yellow)
                     
                     Text("\(finalScore)")
-                        .font(.system(size: 70, weight: .black))
+                        .font(.system(size: 44, weight: .black))
                         .foregroundColor(.purple)
                 }
                 
@@ -946,11 +949,11 @@ struct GameOverDialog: View {
                         Image(systemName: "arrow.clockwise")
                         Text("Play Again")
                     }
-                    .font(.title2)
+                    .font(.headline)
                     .fontWeight(.black)
                     .foregroundColor(.purple)
                     .frame(maxWidth: .infinity)
-                    .padding()
+                    .padding(.vertical,12)
                     .background(Color.white)
                     .cornerRadius(20)
                 }
@@ -962,17 +965,18 @@ struct GameOverDialog: View {
                         Image(systemName: "house.fill")
                         Text("Home")
                     }
-                    .font(.title3)
+                    .font(.headline)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .padding()
+                    .padding(.vertical,12)
                     .background(Color.purple)
                     .cornerRadius(20)
                 }
             }
         }
-        .padding(40)
+        .frame(maxWidth:340)
+        .padding(20)
         .background(
             LinearGradient(
                 colors: [Color.purple, Color.pink, Color.orange],
@@ -982,7 +986,7 @@ struct GameOverDialog: View {
         )
         .cornerRadius(30)
         .shadow(radius: 30)
-        .padding(40)
+        .padding(20)
     }
 }
 // MARK: - Preview
