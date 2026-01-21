@@ -383,12 +383,13 @@ struct LeaderboardView: View {
                     Spacer()
                 } else {
                     ScrollView {
-                        VStack(spacing: 15) {
+                        VStack(spacing: 12) {
                             ForEach(Array(topRecords.enumerated()), id: \.element.id) { index, record in
                                 RecordRowView(record: record, position: index)
                             }
                         }
-                        .padding()
+                        .padding(.horizontal)
+                        .padding(.bottom, 20)
                     }
                 }
             }
@@ -464,7 +465,7 @@ struct RecordRowView: View {
             }
         }
         .padding()
-        .background(Color.white)
+        .background(Color.white.opacity(0.95))
         .cornerRadius(20)
         .shadow(radius: 5)
     }
