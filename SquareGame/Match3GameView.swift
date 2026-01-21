@@ -228,14 +228,21 @@ struct MainMenuView: View {
                     } label: {
                         HStack(spacing: 10) {
                             Image(systemName: "trophy.fill")
-                                .font(.system(size: 20))
+                                .font(.system(size: 25))
+                                .foregroundColor(.yellow)
                             Text("High Scores")
-                                .font(.system(size: 22, weight: .bold))
+                                .font(.system(size: 25, weight: .bold))
                         }
-                        .foregroundColor(.purple)
+                        .foregroundColor(.white)
                         .frame(maxWidth: 320)
                         .padding(.vertical, 16)
-                        .background(Color.white)
+                        .background(
+                            LinearGradient(
+                                colors: [.green, .mint],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
                         .cornerRadius(25)
                         .shadow(radius: 10)
                     }
