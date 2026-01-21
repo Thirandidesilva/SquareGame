@@ -1,18 +1,1000 @@
 //
 //  Match3GameView.swift
-//  SquareGame
+//  Match3Game
 //
-//  Created by Thirandi De Silva on 2026-01-21.
+//  Created by User on 2026-01-21.
 //
 
 import SwiftUI
+import Combine
+// MARK: - Models
 
-struct Match3GameView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct TileData: Identifiable {
+    let id: String
+    var row: Int
+    var col: Int
+    var tileColor: Color
+    var symbolIcon: String
+    var tileName: String
+}
+
+struct GameRecord: Identifiable, Codable {
+    let id: UUID
+    let finalScore: Int
+    let recordDate: Date
+    
+    init(finalScore: Int) {
+        self.id = UUID()
+        self.finalScore = finalScore
+        self.recordDate = Date()
     }
 }
 
+enum TileType {
+    case redStar
+    case blueCircle
+    case greenHeart
+    case purpleSquare
+    case goldCrown
+    
+    var tileColor: Color {
+        switch self {
+        case .redStar: return .red
+        case .blueCircle: return .blue
+        case .greenHeart: return .green
+        case .purpleSquare: return .purple
+        case .goldCrown: return .orange
+        }
+    }
+    
+    var symbolIcon: String {
+        switch self {
+        case .redStar: return "star.fill"
+        case .blueCircle: return "circle.fill"
+        case .greenHeart: return "heart.fill"
+        case .purpleSquare: return "square.fill"
+        case .goldCrown: return "crown.fill"
+        }
+    }
+    
+    var tileName: String {
+        switch self {
+        case .redStar: return "Red Star"
+        case .blueCircle: return "Blue Circle"
+        case .greenHeart: return "Green Heart"
+        case .purpleSquare: return "Purple Square"
+        case .goldCrown: return "Gold Crown"
+        }
+    }
+    
+    static var allTypes: [TileType] {
+        return [.redStar, .blueCircle, .greenHeart, .purpleSquare, .goldCrown]
+    }
+}
+
+// MARK: - Record Manager
+
+class RecordManager: ObservableObject {
+    @Published var allRecords: [GameRecord] = []
+    
+    private let storageKey = "Match3GameRecords"
+    
+    init() {
+        loadRecords()
+    }
+    
+    func saveRecord(_ record: GameRecord) {
+        allRecords.append(record)
+        allRecords.sort { $0.finalScore > $1.finalScore }
+        saveToStorage()
+    }
+    
+    func getTopRecords(limit: Int = 10) -> [GameRecord] {
+        return Array(allRecords.prefix(limit))
+    }
+    
+    private func saveToStorage() {
+        if let encoded = try? JSONEncoder().encode(allRecords) {
+            UserDefaults.standard.set(encoded, forKey: storageKey)
+        }
+    }
+    
+    private func loadRecords() {
+        if let data = UserDefaults.standard.data(forKey: storageKey),
+           let decoded = try? JSONDecoder().decode([GameRecord].self, from: data) {
+            allRecords = decoded
+        }
+    }
+}
+
+// MARK: - Main Game View
+
+struct Match3GameView: View {
+    @StateObject private var recordManager = RecordManager()
+    @State private var activeScreen: GameScreen = .mainMenu
+    
+    enum GameScreen {
+        case mainMenu
+        case gameplay
+        case leaderboard
+    }
+    
+    var body: some View {
+        Group {
+            switch activeScreen {
+            case .mainMenu:
+                MainMenuView(
+                    onStartGame: { activeScreen = .gameplay },
+                    onShowLeaderboard: { activeScreen = .leaderboard }
+                )
+            case .gameplay:
+                GameplayView(
+                    onReturnHome: { activeScreen = .mainMenu },
+                    recordManager: recordManager
+                )
+            case .leaderboard:
+                LeaderboardView(
+                    onReturnHome: { activeScreen = .mainMenu },
+                    recordManager: recordManager
+                )
+            }
+        }
+    }
+}
+
+// MARK: - Main Menu View
+
+struct MainMenuView: View {
+    let onStartGame: () -> Void
+    let onShowLeaderboard: () -> Void
+    
+    var body: some View {
+        ZStack {
+            // Background Gradient
+            LinearGradient(
+                colors: [
+                    Color.pink.opacity(0.8),
+                    Color.purple.opacity(0.8),
+                    Color.indigo.opacity(0.9)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 30) {
+                Spacer()
+                
+                // Animated Icons
+                HStack(spacing: 20) {
+                    IconBox(color: .red, icon: "star.fill", delay: 0.0)
+                    IconBox(color: .blue, icon: "circle.fill", delay: 0.1)
+                    IconBox(color: .green, icon: "heart.fill", delay: 0.2)
+                }
+                
+                // Title
+                VStack(spacing: 10) {
+                    Text("Match 3")
+                        .font(.system(size: 70, weight: .black))
+                        .foregroundColor(.white)
+                        .shadow(radius: 10)
+                    
+                    Text("60 Second Rush")
+                        .font(.system(size: 30, weight: .bold))
+                        .foregroundColor(.yellow)
+                        .shadow(radius: 5)
+                }
+                
+                // Subtitle
+                Text("⏱️ 60 Seconds • Max Score Challenge!")
+                    .font(.headline)
+                    .foregroundColor(.purple)
+                    .padding()
+                    .background(Color.white.opacity(0.9))
+                    .cornerRadius(20)
+                
+                Spacer()
+                
+                // Buttons
+                VStack(spacing: 20) {
+                    // Start Button
+                    Button {
+                        onStartGame()
+                    } label: {
+                        HStack(spacing: 15) {
+                            Image(systemName: "bolt.fill")
+                                .font(.system(size: 30))
+                            Text("START")
+                                .font(.system(size: 35, weight: .black))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 25)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.yellow, Color.orange],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(25)
+                        .shadow(radius: 10)
+                    }
+                    
+                    // High Scores Button
+                    Button {
+                        onShowLeaderboard()
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: "trophy.fill")
+                                .font(.system(size: 20))
+                            Text("High Scores")
+                                .font(.system(size: 22, weight: .bold))
+                        }
+                        .foregroundColor(.purple)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .background(Color.white)
+                        .cornerRadius(25)
+                        .shadow(radius: 10)
+                    }
+                }
+                .padding(.horizontal, 30)
+                
+                // Instructions
+                VStack(spacing: 10) {
+                    Text("How to Play:")
+                        .font(.headline)
+                        .foregroundColor(.purple)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("🎯")
+                            Text("Match 3 or more tiles in a row")
+                                .font(.subheadline)
+                        }
+                        HStack {
+                            Text("⚡")
+                            Text("Score as many points as possible")
+                                .font(.subheadline)
+                        }
+                        HStack {
+                            Text("⏰")
+                            Text("You have 60 seconds!")
+                                .font(.subheadline)
+                        }
+                    }
+                    .foregroundColor(.gray)
+                }
+                .padding()
+                .background(Color.white.opacity(0.9))
+                .cornerRadius(20)
+                .padding(.horizontal, 30)
+                
+                Spacer()
+            }
+        }
+    }
+}
+
+struct IconBox: View {
+    let color: Color
+    let icon: String
+    let delay: Double
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(color)
+                .frame(width: 70, height: 70)
+                .shadow(radius: 10)
+            
+            Image(systemName: icon)
+                .font(.system(size: 40))
+                .foregroundColor(.white)
+        }
+        .offset(y: -10)
+        .animation(
+            Animation.easeInOut(duration: 1.0)
+                .repeatForever(autoreverses: true)
+                .delay(delay),
+            value: UUID()
+        )
+    }
+}
+
+// MARK: - Leaderboard View
+
+struct LeaderboardView: View {
+    let onReturnHome: () -> Void
+    @ObservedObject var recordManager: RecordManager
+    
+    var body: some View {
+        ZStack {
+            // Background
+            LinearGradient(
+                colors: [
+                    Color.pink.opacity(0.8),
+                    Color.purple.opacity(0.8),
+                    Color.indigo.opacity(0.9)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 20) {
+                // Header
+                HStack {
+                    Button {
+                        onReturnHome()
+                    } label: {
+                        HStack {
+                            Image(systemName: "house.fill")
+                            Text("Home")
+                        }
+                        .font(.headline)
+                        .foregroundColor(.purple)
+                        .padding()
+                        .background(Color.purple.opacity(0.2))
+                        .cornerRadius(15)
+                    }
+                    
+                    Spacer()
+                    
+                    HStack {
+                        Image(systemName: "trophy.fill")
+                            .foregroundColor(.yellow)
+                        Text("High Scores")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                    }
+                    
+                    Spacer()
+                    
+                    // Invisible button for balance
+                    Button {} label: {
+                        HStack {
+                            Image(systemName: "house.fill")
+                            Text("Home")
+                        }
+                        .font(.headline)
+                    }
+                    .hidden()
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(25)
+                .padding(.horizontal)
+                
+                // Records List
+                let topRecords = recordManager.getTopRecords()
+                
+                if topRecords.isEmpty {
+                    Spacer()
+                    VStack(spacing: 20) {
+                        Image(systemName: "trophy.fill")
+                            .font(.system(size: 80))
+                            .foregroundColor(.white.opacity(0.3))
+                        
+                        Text("No Scores Yet!")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                        Text("Play your first game to set a record!")
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    .padding()
+                    .background(Color.white.opacity(0.2))
+                    .cornerRadius(25)
+                    .padding()
+                    Spacer()
+                } else {
+                    ScrollView {
+                        VStack(spacing: 15) {
+                            ForEach(Array(topRecords.enumerated()), id: \.element.id) { index, record in
+                                RecordRowView(record: record, position: index)
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct RecordRowView: View {
+    let record: GameRecord
+    let position: Int
+    
+    var rankGradient: [Color] {
+        switch position {
+        case 0: return [.yellow, Color(red: 0.8, green: 0.6, blue: 0)]
+        case 1: return [.gray, Color(red: 0.6, green: 0.6, blue: 0.6)]
+        case 2: return [.orange, Color(red: 0.8, green: 0.4, blue: 0)]
+        default: return [.blue, Color(red: 0.2, green: 0.4, blue: 0.8)]
+        }
+    }
+    
+    var body: some View {
+        HStack(spacing: 20) {
+            // Rank Badge
+            ZStack {
+                LinearGradient(
+                    colors: rankGradient,
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .frame(width: 70, height: 70)
+                .cornerRadius(15)
+                
+                if position < 3 {
+                    VStack {
+                        Image(systemName: "trophy.fill")
+                            .font(.system(size: 30))
+                            .foregroundColor(.white)
+                        Text("#\(position + 1)")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                    }
+                } else {
+                    Text("#\(position + 1)")
+                        .font(.system(size: 28, weight: .black))
+                        .foregroundColor(.white)
+                }
+            }
+            
+            // Score Info
+            VStack(alignment: .leading, spacing: 5) {
+                HStack {
+                    Image(systemName: "star.fill")
+                        .foregroundColor(.yellow)
+                    Text("\(record.finalScore)")
+                        .font(.system(size: 35, weight: .black))
+                        .foregroundColor(.purple)
+                    Text("points")
+                        .foregroundColor(.gray)
+                }
+                
+                Text(formatDate(record.recordDate))
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            
+            Spacer()
+            
+            // Medal for top 3
+            if position < 3 {
+                Text(position == 0 ? "🥇" : position == 1 ? "🥈" : "🥉")
+                    .font(.system(size: 45))
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(radius: 5)
+    }
+    
+    func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+}
+
+// MARK: - Gameplay View
+
+struct GameplayView: View {
+    let onReturnHome: () -> Void
+    @ObservedObject var recordManager: RecordManager
+    
+    let BOARD_SIZE = 5
+    let TIME_LIMIT: TimeInterval = 60.0
+    
+    @State private var gameBoard: [TileData] = []
+    @State private var pickedCell: TileData? = nil
+    @State private var countdown: TimeInterval = 60.0
+    @State private var timerRunning = false
+    @State private var playerScore = 0
+    @State private var displayGameOver = false
+    @State private var feedbackText = "Match 3 tiles to score!"
+    @State private var streakCounter = 0
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                // Background
+                LinearGradient(
+                    colors: [
+                        Color.pink.opacity(0.8),
+                        Color.purple.opacity(0.8),
+                        Color.indigo.opacity(0.9)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                
+                VStack(spacing: 20) {
+                    // Header
+                    VStack(spacing: 15) {
+                        HStack {
+                            Button {
+                                onReturnHome()
+                            } label: {
+                                Image(systemName: "house.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(Color.purple)
+                                    .cornerRadius(15)
+                            }
+                            
+                            Spacer()
+                            
+                            // Timer
+                            HStack(spacing: 10) {
+                                Image(systemName: "clock.fill")
+                                    .foregroundColor(.white)
+                                Text(formatCountdown(countdown))
+                                    .font(.system(size: 24, weight: .black, design: .monospaced))
+                                    .foregroundColor(.white)
+                            }
+                            .padding()
+                            .background(
+                                countdown <= 10
+                                    ? LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing)
+                                    : LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
+                            )
+                            .cornerRadius(20)
+                            .shadow(radius: 5)
+                            
+                            Spacer()
+                            
+                            Button {
+                                startNewGame()
+                            } label: {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(Color.orange)
+                                    .cornerRadius(15)
+                            }
+                        }
+                        
+                        // Time Progress Bar
+                        GeometryReader { geo in
+                            ZStack(alignment: .leading) {
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(height: 12)
+                                    .cornerRadius(6)
+                                
+                                Rectangle()
+                                    .fill(
+                                        countdown <= 10
+                                            ? LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing)
+                                            : LinearGradient(colors: [.green, .blue], startPoint: .leading, endPoint: .trailing)
+                                    )
+                                    .frame(width: geo.size.width * CGFloat(countdown / TIME_LIMIT), height: 12)
+                                    .cornerRadius(6)
+                            }
+                        }
+                        .frame(height: 12)
+                        
+                        // Score Display
+                        HStack {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                                .font(.system(size: 30))
+                            Text("\(playerScore)")
+                                .font(.system(size: 40, weight: .black))
+                                .foregroundColor(.orange)
+                            Text("POINTS")
+                                .font(.headline)
+                                .foregroundColor(.orange)
+                        }
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                colors: [Color.yellow.opacity(0.3), Color.orange.opacity(0.3)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(20)
+                        
+                        // Feedback Text
+                        Text(feedbackText)
+                            .font(.headline)
+                            .foregroundColor(.purple)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.purple.opacity(0.2))
+                            .cornerRadius(15)
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(25)
+                    .padding(.horizontal)
+                    
+                    // Game Board
+                    if !gameBoard.isEmpty {
+                        VStack(spacing: 12) {
+                            ForEach(0..<BOARD_SIZE, id: \.self) { row in
+                                HStack(spacing: 12) {
+                                    ForEach(0..<BOARD_SIZE, id: \.self) { col in
+                                        if let tile = gameBoard.first(where: { $0.row == row && $0.col == col }) {
+                                            TileView(
+                                                tileData: tile,
+                                                isChosen: pickedCell?.id == tile.id,
+                                                onTileTap: { handleTileTap(tile) }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(25)
+                        .padding(.horizontal)
+                    }
+                    
+                    Spacer()
+                }
+                .onAppear {
+                    startNewGame()
+                }
+                
+                // Game Over Overlay
+                if displayGameOver {
+                    Color.black.opacity(0.6)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            displayGameOver = false
+                            onReturnHome()
+                        }
+                    
+                    GameOverDialog(
+                        finalScore: playerScore,
+                        onPlayAgain: {
+                            displayGameOver = false
+                            startNewGame()
+                        },
+                        onGoHome: {
+                            displayGameOver = false
+                            onReturnHome()
+                        }
+                    )
+                }
+            }
+        }
+    }
+    
+    func startNewGame() {
+        gameBoard = generateBoard()
+        pickedCell = nil
+        countdown = TIME_LIMIT
+        playerScore = 0
+        timerRunning = true
+        displayGameOver = false
+        feedbackText = "Match 3 tiles to score!"
+        streakCounter = 0
+        
+        // Start timer
+        Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { timer in
+            if timerRunning && countdown > 0 {
+                countdown -= 0.01
+            } else if countdown <= 0 {
+                timerRunning = false
+                timer.invalidate()
+                endGame()
+            } else if !timerRunning {
+                timer.invalidate()
+            }
+        }
+    }
+    
+    func generateBoard() -> [TileData] {
+        var tiles: [TileData] = []
+        for row in 0..<BOARD_SIZE {
+            for col in 0..<BOARD_SIZE {
+                let randomType = TileType.allTypes.randomElement()!
+                tiles.append(TileData(
+                    id: "\(row)-\(col)",
+                    row: row,
+                    col: col,
+                    tileColor: randomType.tileColor,
+                    symbolIcon: randomType.symbolIcon,
+                    tileName: randomType.tileName
+                ))
+            }
+        }
+        return tiles
+    }
+    
+    func handleTileTap(_ tile: TileData) {
+        if displayGameOver || countdown <= 0 { return }
+        
+        if pickedCell == nil {
+            pickedCell = tile
+            feedbackText = "Selected \(tile.tileName)"
+        } else {
+            if pickedCell!.id == tile.id {
+                pickedCell = nil
+                feedbackText = "Selection cleared"
+                return
+            }
+            
+            let isNextTo =
+                (abs(pickedCell!.row - tile.row) == 1 && pickedCell!.col == tile.col) ||
+                (abs(pickedCell!.col - tile.col) == 1 && pickedCell!.row == tile.row)
+            
+            if isNextTo {
+                performSwap(pickedCell!, tile)
+            } else {
+                feedbackText = "Select adjacent tiles only!"
+                pickedCell = nil
+            }
+        }
+    }
+    
+    func performSwap(_ tile1: TileData, _ tile2: TileData) {
+        gameBoard = gameBoard.map { tile in
+            if tile.id == tile1.id {
+                return TileData(id: tile.id, row: tile.row, col: tile.col, tileColor: tile2.tileColor, symbolIcon: tile2.symbolIcon, tileName: tile2.tileName)
+            } else if tile.id == tile2.id {
+                return TileData(id: tile.id, row: tile.row, col: tile.col, tileColor: tile1.tileColor, symbolIcon: tile1.symbolIcon, tileName: tile1.tileName)
+            }
+            return tile
+        }
+        
+        pickedCell = nil
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            findAndClearMatches()
+        }
+    }
+    
+    func findAndClearMatches() {
+        var matchedTiles: Set<String> = []
+        
+        // Check horizontal
+        for row in 0..<BOARD_SIZE {
+            for col in 0...(BOARD_SIZE - 3) {
+                let tiles = [
+                    gameBoard.first(where: { $0.row == row && $0.col == col })!,
+                    gameBoard.first(where: { $0.row == row && $0.col == col + 1 })!,
+                    gameBoard.first(where: { $0.row == row && $0.col == col + 2 })!
+                ]
+                
+                if tiles[0].tileColor == tiles[1].tileColor && tiles[1].tileColor == tiles[2].tileColor {
+                    matchedTiles.insert(tiles[0].id)
+                    matchedTiles.insert(tiles[1].id)
+                    matchedTiles.insert(tiles[2].id)
+                }
+            }
+        }
+        
+        // Check vertical
+        for col in 0..<BOARD_SIZE {
+            for row in 0...(BOARD_SIZE - 3) {
+                let tiles = [
+                    gameBoard.first(where: { $0.row == row && $0.col == col })!,
+                    gameBoard.first(where: { $0.row == row + 1 && $0.col == col })!,
+                    gameBoard.first(where: { $0.row == row + 2 && $0.col == col })!
+                ]
+                
+                if tiles[0].tileColor == tiles[1].tileColor && tiles[1].tileColor == tiles[2].tileColor {
+                    matchedTiles.insert(tiles[0].id)
+                    matchedTiles.insert(tiles[1].id)
+                    matchedTiles.insert(tiles[2].id)
+                }
+            }
+        }
+        
+        if !matchedTiles.isEmpty {
+            let matchCount = matchedTiles.count / 3
+            let points = matchCount * 10
+            playerScore += points
+            
+            streakCounter += 1
+            
+            if streakCounter > 1 {
+                let bonusPoints = streakCounter * 5
+                playerScore += bonusPoints
+                feedbackText = "🔥 \(streakCounter)x COMBO! +\(points + bonusPoints) pts!"
+            } else {
+                feedbackText = "✨ Match! +\(points) points!"
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                refillTiles(Array(matchedTiles))
+            }
+        } else {
+            feedbackText = "No matches. Keep trying!"
+            streakCounter = 0
+        }
+    }
+    
+    func refillTiles(_ matchedIds: [String]) {
+        gameBoard = gameBoard.map { tile in
+            if matchedIds.contains(tile.id) {
+                let randomType = TileType.allTypes.randomElement()!
+                return TileData(
+                    id: tile.id,
+                    row: tile.row,
+                    col: tile.col,
+                    tileColor: randomType.tileColor,
+                    symbolIcon: randomType.symbolIcon,
+                    tileName: randomType.tileName
+                )
+            }
+            return tile
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            findAndClearMatches()
+        }
+    }
+    
+    func endGame() {
+        let newRecord = GameRecord(finalScore: playerScore)
+        recordManager.saveRecord(newRecord)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            displayGameOver = true
+        }
+    }
+    
+    func formatCountdown(_ time: TimeInterval) -> String {
+        let secs = Int(time)
+        let ms = Int((time.truncatingRemainder(dividingBy: 1)) * 100)
+        return String(format: "%02d.%02ds", secs, ms)
+    }
+}
+
+struct TileView: View {
+    let tileData: TileData
+    let isChosen: Bool
+    let onTileTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTileTap) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(tileData.tileColor)
+                    .shadow(radius: isChosen ? 0 : 5)
+                
+                Image(systemName: tileData.symbolIcon)
+                    .font(.system(size: 35))
+                    .foregroundColor(.white)
+                
+                if isChosen {
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color.white, lineWidth: 4)
+                }
+            }
+            .aspectRatio(1, contentMode: .fit)
+            .scaleEffect(isChosen ? 1.1 : 1.0)
+            .animation(.spring(response: 0.3), value: isChosen)
+        }
+    }
+}
+
+struct GameOverDialog: View {
+    let finalScore: Int
+    let onPlayAgain: () -> Void
+    let onGoHome: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 25) {
+            // Trophy Icon
+            ZStack {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 130, height: 130)
+                    .shadow(radius: 20)
+                
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 70))
+                    .foregroundColor(.yellow)
+            }
+            
+            // Title
+            VStack(spacing: 10) {
+                Text("TIME'S UP!")
+                    .font(.system(size: 50, weight: .black))
+                    .foregroundColor(.white)
+                
+                Text("Great Job!")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+            }
+            
+            // Score
+            VStack(spacing: 10) {
+                Text("FINAL SCORE")
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundColor(.purple)
+                
+                HStack {
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 45))
+                        .foregroundColor(.yellow)
+                    
+                    Text("\(finalScore)")
+                        .font(.system(size: 70, weight: .black))
+                        .foregroundColor(.purple)
+                }
+                
+                Text("POINTS")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundColor(.purple)
+            }
+            .padding()
+            .background(Color.white.opacity(0.9))
+            .cornerRadius(20)
+            
+            // Buttons
+            VStack(spacing: 15) {
+                Button {
+                    onPlayAgain()
+                } label: {
+                    HStack {
+                        Image(systemName: "arrow.clockwise")
+                        Text("Play Again")
+                    }
+                    .font(.title2)
+                    .fontWeight(.black)
+                    .foregroundColor(.purple)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(20)
+                }
+                
+                Button {
+                    onGoHome()
+                } label: {
+                    HStack {
+                        Image(systemName: "house.fill")
+                        Text("Home")
+                    }
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.purple)
+                    .cornerRadius(20)
+                }
+            }
+        }
+        .padding(40)
+        .background(
+            LinearGradient(
+                colors: [Color.purple, Color.pink, Color.orange],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .cornerRadius(30)
+        .shadow(radius: 30)
+        .padding(40)
+    }
+}
+// MARK: - Preview
 #Preview {
-    Match3GameView()
+Match3GameView()
 }
