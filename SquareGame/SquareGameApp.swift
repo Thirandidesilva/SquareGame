@@ -11,7 +11,7 @@ import SwiftUI
 struct SquareGameApp: App {
     var body: some Scene {
         WindowGroup {
-            SquareGameTwo()
+            GameSelectorView()
         }
     }
 }

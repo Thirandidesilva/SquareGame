@@ -26,7 +26,7 @@ struct GameSelectorView: View {
                 // Show selected game
                 switch game {
                 case .colorMatch:
-                    SquareGameTwo()
+                    SquareGameTwo(selectedGame: $selectedGame)
                         .navigationBarHidden(true)
                 case .match3:
                     Match3GameView()

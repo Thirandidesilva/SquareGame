@@ -110,6 +110,8 @@ struct SquareGameTwo: View {
     @State private var showLevelSelection = true
     @State private var showHighScores = false
     @State private var selectedLevel: DifficultLevel = .easy
+    @Binding var selectedGame: GameSelectorView.SelectedGame?
+       //add this if error remove this
     
     var body: some View {
         if showHighScores {
@@ -122,7 +124,8 @@ struct SquareGameTwo: View {
                 selectedLevel: $selectedLevel,
                 showLevelSelection: $showLevelSelection,
                 showHighScores: $showHighScores,
-                highScoreManager: highScoreManager
+                highScoreManager: highScoreManager,
+                selectedGame: $selectedGame
             )
         } else {
             GameView(
@@ -140,7 +143,7 @@ struct LevelSelectionView: View {
     @Binding var showLevelSelection: Bool
     @Binding var showHighScores: Bool
     @ObservedObject var highScoreManager: HighScoreManager
-    @Environment(\.dismiss) var dismiss  // Add this
+    @Binding var selectedGame: GameSelectorView.SelectedGame?
     
     var body: some View {
         ZStack {
@@ -150,7 +153,7 @@ struct LevelSelectionView: View {
                 // ===== ADD BACK BUTTON HERE =====
                                HStack {
                                    Button {
-                                       dismiss()  // Goes back to GameSelectorView
+                                       selectedGame = nil// Goes back to GameSelectorView
                                    } label: {
                                        HStack {
                                            Image(systemName: "arrow.left")
@@ -168,7 +171,6 @@ struct LevelSelectionView: View {
                 
                 
             
-                Spacer()
                 
                 // Title
                 VStack(spacing: 10) {
@@ -858,5 +860,5 @@ struct WinDialogView: View {
 
 
 #Preview {
-    SquareGameTwo()
+    SquareGameTwo(selectedGame: .constant(nil))
 }
