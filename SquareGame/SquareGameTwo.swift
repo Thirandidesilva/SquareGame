@@ -767,7 +767,7 @@ struct WinDialogView: View {
             }
             
             VStack(spacing: 10) {
-                Text("🎊 Congratulations! 🎊")
+                Text("Congratulations!")
                     .font(.title)
                     .fontWeight(.bold)
                 
