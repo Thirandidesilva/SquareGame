@@ -131,9 +131,7 @@ struct SquareGameTwo: View {
                 highScoreManager: highScoreManager
             )
         }
-        
     }
-    
 }
 
 // ===== START: Level Selection View =====
@@ -142,13 +140,34 @@ struct LevelSelectionView: View {
     @Binding var showLevelSelection: Bool
     @Binding var showHighScores: Bool
     @ObservedObject var highScoreManager: HighScoreManager
+    @Environment(\.dismiss) var dismiss  // Add this
     
     var body: some View {
         ZStack {
             
            
-            VStack(spacing: 30) {
+        VStack(spacing: 30) {
+                // ===== ADD BACK BUTTON HERE =====
+                               HStack {
+                                   Button {
+                                       dismiss()  // Goes back to GameSelectorView
+                                   } label: {
+                                       HStack {
+                                           Image(systemName: "arrow.left")
+                                           Text("Back")
+                                       }
+                                       .font(.headline)
+                                       .foregroundColor(.purple)
+                                       .padding()
+                                       .background(Color.white.opacity(0.2))
+                                       .cornerRadius(15)
+                                   }
+                                   Spacer()
+                               }
+                               .padding(.horizontal)
                 
+                
+            
                 Spacer()
                 
                 // Title
