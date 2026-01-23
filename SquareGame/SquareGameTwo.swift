@@ -147,8 +147,6 @@ struct LevelSelectionView: View {
     
     var body: some View {
         ZStack {
-            
-           
         VStack(spacing: 30) {
                 // ===== ADD BACK BUTTON HERE =====
                                HStack {
@@ -492,6 +490,15 @@ struct GameView: View {
     
     var body: some View {
         ZStack {
+            
+            LinearGradient(
+                colors: [Color.purple.opacity(0.2), Color.blue.opacity(0.2)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            
             if items.isEmpty {
                 Color.clear
                     .onAppear {

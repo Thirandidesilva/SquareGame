@@ -30,7 +30,7 @@ struct GameSelectorView: View {
                         .navigationBarHidden(true)
                 case .match3:
                     Match3GameView()
-                        .navigationBarHidden(true)
+                            .navigationBarHidden(true)
                 }
             } else {
                 // Show game selector menu
@@ -38,7 +38,7 @@ struct GameSelectorView: View {
                     .navigationBarHidden(true)
             }
         }
-    }
+    } 
     
     // ===== MAIN MENU =====
     var mainMenu: some View {
