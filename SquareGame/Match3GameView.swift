@@ -650,15 +650,15 @@ struct GameplayView: View {
                     startNewGame()
                 }
                 
-                // ⏰ TIME WARNING ALERT
+                //  TIME WARNING ALERT
                 if showTimeAlert {
                     VStack {
                         Spacer()
                         Text(timeAlertText)
                             .font(.headline)
                             .foregroundColor(.white)
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 20)
+                            .padding(.vertical, 15)
+                            .padding(.horizontal, 25)
                             .background(
                                 LinearGradient(
                                     colors: countdown <= 10 ? [.red, .orange] : [.orange, .yellow],
