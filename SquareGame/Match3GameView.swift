@@ -789,19 +789,29 @@ struct GameplayView: View {
     }
     
     func performSwap(_ tile1: TileData, _ tile2: TileData) {
-        gameBoard = gameBoard.map { tile in
-            if tile.id == tile1.id {
-                return TileData(id: tile.id, row: tile.row, col: tile.col,
-                                tileColor: tile2.tileColor,
-                                symbolIcon: tile2.symbolIcon,
-                                tileName: tile2.tileName)
-            } else if tile.id == tile2.id {
-                return TileData(id: tile.id, row: tile.row, col: tile.col,
-                                tileColor: tile1.tileColor,
-                                symbolIcon: tile1.symbolIcon,
-                                tileName: tile1.tileName)
+        withAnimation(.easeInOut(duration: 0.25)) {
+            gameBoard = gameBoard.map { tile in
+                if tile.id == tile1.id {
+                    return TileData(
+                        id: tile.id,
+                        row: tile.row,
+                        col: tile.col,
+                        tileColor: tile2.tileColor,
+                        symbolIcon: tile2.symbolIcon,
+                        tileName: tile2.tileName
+                    )
+                } else if tile.id == tile2.id {
+                    return TileData(
+                        id: tile.id,
+                        row: tile.row,
+                        col: tile.col,
+                        tileColor: tile1.tileColor,
+                        symbolIcon: tile1.symbolIcon,
+                        tileName: tile1.tileName
+                    )
+                }
+                return tile
             }
-            return tile
         }
         
         pickedCell = nil
@@ -810,6 +820,7 @@ struct GameplayView: View {
             findAndClearMatches()
         }
     }
+
     
     func findAndClearMatches() {
         var matchedTiles: Set<String> = []
