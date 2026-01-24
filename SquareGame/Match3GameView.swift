@@ -510,6 +510,8 @@ struct GameplayView: View {
     @State private var timeAlertText = ""
     @State private var didShow30SecAlert = false
     @State private var didShow10SecAlert = false
+    @State private var showComboParticles = false
+
     
     var body: some View {
         GeometryReader { geometry in
@@ -669,6 +671,19 @@ struct GameplayView: View {
                             .cornerRadius(20)
                             .shadow(radius: 10)
                             .padding(.bottom, 120)
+                    }
+                }
+                
+                //particles
+                // 🎯 COMBO PARTICLE EXPLOSION
+                if showComboParticles {
+                    ZStack {
+                        ForEach(0..<20, id: \.self) { index in
+                            ComboParticleView(
+                                color: [.yellow, .orange, .pink, .purple].randomElement()!,
+                                delay: Double(index) * 0.02
+                            )
+                        }
                     }
                 }
                 
@@ -870,6 +885,12 @@ struct GameplayView: View {
             
             if streakCounter > 1 {
                 playerScore += streakCounter * 5
+                //  Trigger particle explosion
+                    showComboParticles = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+                        showComboParticles = false
+                    }
+                
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
@@ -914,6 +935,42 @@ struct GameplayView: View {
         return String(format: "%02d.%02d", seconds, ms)
     }
 }
+
+//particles
+struct ComboParticleView: View {
+    let color: Color
+    let delay: Double
+    
+    @State private var moveUp = false
+    @State private var fadeOut = false
+    @State private var scaleUp = false
+    
+    // Random size per particle (bigger)
+    let size = CGFloat.random(in: 14...22)
+    let xOffset = CGFloat.random(in: -120...120)
+    let yOffset = CGFloat.random(in: -180...(-100))
+    
+    var body: some View {
+        Circle()
+            .fill(color)
+            .frame(width: size, height: size)
+            .scaleEffect(scaleUp ? 1.2 : 0.6)
+            .offset(
+                x: xOffset,
+                y: moveUp ? yOffset : 0
+            )
+            .opacity(fadeOut ? 0 : 1)
+            .onAppear {
+                withAnimation(.easeOut(duration: 0.9).delay(delay)) {
+                    moveUp = true
+                    fadeOut = true
+                    scaleUp = true
+                }
+            }
+    }
+}
+
+
 
 struct TileView: View {
     let tileData: TileData
