@@ -505,9 +505,16 @@ struct GameplayView: View {
     @State private var feedbackText = "Match 3 tiles to score!"
     @State private var streakCounter = 0
     
+    // Time alert states
+    @State private var showTimeAlert = false
+    @State private var timeAlertText = ""
+    @State private var didShow30SecAlert = false
+    @State private var didShow10SecAlert = false
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
+                
                 // Background
                 LinearGradient(
                     colors: [
@@ -520,15 +527,16 @@ struct GameplayView: View {
                 )
                 .ignoresSafeArea()
                 
+                // MAIN CONTENT
                 VStack(spacing: 20) {
-                    // Header
+                    
+                    // HEADER
                     VStack(spacing: 15) {
                         HStack {
                             Button {
                                 onReturnHome()
                             } label: {
                                 Image(systemName: "house.fill")
-                                    .font(.title2)
                                     .foregroundColor(.white)
                                     .padding(8)
                                     .background(Color.purple)
@@ -537,7 +545,6 @@ struct GameplayView: View {
                             
                             Spacer()
                             
-                            // Timer
                             HStack(spacing: 10) {
                                 Image(systemName: "clock.fill")
                                     .foregroundColor(.white)
@@ -545,15 +552,14 @@ struct GameplayView: View {
                                     .font(.system(size: 24, weight: .black, design: .monospaced))
                                     .foregroundColor(.white)
                             }
-                            .padding(.vertical,8)
-                            .padding(.horizontal,12)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
                             .background(
                                 countdown <= 10
-                                    ? LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing)
-                                    : LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
+                                ? LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing)
+                                : LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
                             )
                             .cornerRadius(14)
-                            .shadow(radius: 5)
                             
                             Spacer()
                             
@@ -561,7 +567,6 @@ struct GameplayView: View {
                                 startNewGame()
                             } label: {
                                 Image(systemName: "arrow.clockwise")
-                                    .font(.title2)
                                     .foregroundColor(.white)
                                     .padding(8)
                                     .background(Color.orange)
@@ -569,57 +574,46 @@ struct GameplayView: View {
                             }
                         }
                         
-                        // Time Progress Bar
+                        // Time progress bar
                         GeometryReader { geo in
                             ZStack(alignment: .leading) {
                                 Rectangle()
                                     .fill(Color.gray.opacity(0.3))
-                                    .frame(height: 12)
-                                    .cornerRadius(6)
+                                    .frame(height: 10)
+                                    .cornerRadius(5)
                                 
                                 Rectangle()
                                     .fill(
                                         countdown <= 10
-                                            ? LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing)
-                                            : LinearGradient(colors: [.green, .blue], startPoint: .leading, endPoint: .trailing)
+                                        ? LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing)
+                                        : LinearGradient(colors: [.green, .blue], startPoint: .leading, endPoint: .trailing)
                                     )
-                                    .frame(width: geo.size.width * CGFloat(countdown / TIME_LIMIT), height: 8)
-                                    .cornerRadius(6)
+                                    .frame(
+                                        width: geo.size.width * CGFloat(countdown / TIME_LIMIT),
+                                        height: 10
+                                    )
+                                    .cornerRadius(5)
                             }
                         }
-                        .frame(height: 12)
+                        .frame(height: 10)
                         
-                        // Score Display
+                        // Score
                         HStack {
                             Image(systemName: "star.fill")
                                 .foregroundColor(.yellow)
-                                .font(.system(size: 25))
                             Text("\(playerScore)")
-                                .font(.system(size: 30, weight: .black))
+                                .font(.system(size: 28, weight: .black))
                                 .foregroundColor(.orange)
                             Text("POINTS")
-                                .font(.headline)
                                 .foregroundColor(.orange)
                         }
-                        .padding(.vertical,8)
-                        .padding(.horizontal,12)
-                        .background(
-                            LinearGradient(
-                                colors: [Color.yellow.opacity(0.3), Color.orange.opacity(0.3)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .cornerRadius(14)
                         
-                        // Feedback Text
                         Text(feedbackText)
                             .font(.headline)
                             .foregroundColor(.purple)
-                            .padding(.vertical,6)
-                            .padding(.horizontal,12)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.purple.opacity(0.2))
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 12)
+                            .background(Color.purple.opacity(0.15))
                             .cornerRadius(15)
                     }
                     .padding()
@@ -627,47 +621,61 @@ struct GameplayView: View {
                     .cornerRadius(25)
                     .padding(.horizontal)
                     
-                    .padding(.top, 20)
-                
-                    // Game Board
-                    if !gameBoard.isEmpty {
-                        VStack(spacing: 15) {
-                            ForEach(0..<BOARD_SIZE, id: \.self) { row in
-                                HStack(spacing: 15) {
-                                    ForEach(0..<BOARD_SIZE, id: \.self) { col in
-                                        if let tile = gameBoard.first(where: { $0.row == row && $0.col == col }) {
-                                            TileView(
-                                                tileData: tile,
-                                                isChosen: pickedCell?.id == tile.id,
-                                                onTileTap: { handleTileTap(tile) }
-                                            )
-                                        }
+                    // GAME BOARD
+                    VStack(spacing: 15) {
+                        ForEach(0..<BOARD_SIZE, id: \.self) { row in
+                            HStack(spacing: 15) {
+                                ForEach(0..<BOARD_SIZE, id: \.self) { col in
+                                    if let tile = gameBoard.first(where: { $0.row == row && $0.col == col }) {
+                                        TileView(
+                                            tileData: tile,
+                                            isChosen: pickedCell?.id == tile.id,
+                                            onTileTap: {
+                                                handleTileTap(tile)
+                                            }
+                                        )
                                     }
                                 }
                             }
-                            .frame(maxWidth: geometry.size.width - 32)
                         }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(25)
-                        .padding(.horizontal)
                     }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(25)
+                    .padding(.horizontal)
                     
                     Spacer()
                 }
                 .onAppear {
                     startNewGame()
-                   
                 }
                 
-                // Game Over Overlay
+                // ⏰ TIME WARNING ALERT
+                if showTimeAlert {
+                    VStack {
+                        Spacer()
+                        Text(timeAlertText)
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 20)
+                            .background(
+                                LinearGradient(
+                                    colors: countdown <= 10 ? [.red, .orange] : [.orange, .yellow],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .cornerRadius(20)
+                            .shadow(radius: 10)
+                            .padding(.bottom, 120)
+                    }
+                }
+                
+                // GAME OVER OVERLAY
                 if displayGameOver {
                     Color.black.opacity(0.6)
                         .ignoresSafeArea()
-                        .onTapGesture {
-                            displayGameOver = false
-                            onReturnHome()
-                        }
                     
                     GameOverDialog(
                         finalScore: playerScore,
@@ -685,26 +693,51 @@ struct GameplayView: View {
         }
     }
     
+    // MARK: - GAME LOGIC
+    
     func startNewGame() {
         gameBoard = generateBoard()
         pickedCell = nil
         countdown = TIME_LIMIT
         playerScore = 0
+        streakCounter = 0
         timerRunning = true
         displayGameOver = false
         feedbackText = "Match 3 tiles to score!"
-        streakCounter = 0
         
-        // Start timer
+        didShow30SecAlert = false
+        didShow10SecAlert = false
+        showTimeAlert = false
+        
         Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { timer in
             if timerRunning && countdown > 0 {
                 countdown -= 0.01
+                
+                if Int(countdown) == 30 && !didShow30SecAlert {
+                    didShow30SecAlert = true
+                    showQuickAlert(text: "⏳ Only 30 seconds left! Be quick!")
+                }
+                
+                if Int(countdown) == 10 && !didShow10SecAlert {
+                    didShow10SecAlert = true
+                    showQuickAlert(text: "⚠️ Only 10 seconds left!")
+                }
+                
             } else if countdown <= 0 {
-                timerRunning = false
                 timer.invalidate()
                 endGame()
-            } else if !timerRunning {
-                timer.invalidate()
+            }
+        }
+    }
+    
+    func showQuickAlert(text: String) {
+        timeAlertText = text
+        withAnimation {
+            showTimeAlert = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation {
+                showTimeAlert = false
             }
         }
     }
@@ -714,14 +747,16 @@ struct GameplayView: View {
         for row in 0..<BOARD_SIZE {
             for col in 0..<BOARD_SIZE {
                 let randomType = TileType.allTypes.randomElement()!
-                tiles.append(TileData(
-                    id: "\(row)-\(col)",
-                    row: row,
-                    col: col,
-                    tileColor: randomType.tileColor,
-                    symbolIcon: randomType.symbolIcon,
-                    tileName: randomType.tileName
-                ))
+                tiles.append(
+                    TileData(
+                        id: "\(row)-\(col)",
+                        row: row,
+                        col: col,
+                        tileColor: randomType.tileColor,
+                        symbolIcon: randomType.symbolIcon,
+                        tileName: randomType.tileName
+                    )
+                )
             }
         }
         return tiles
@@ -756,9 +791,15 @@ struct GameplayView: View {
     func performSwap(_ tile1: TileData, _ tile2: TileData) {
         gameBoard = gameBoard.map { tile in
             if tile.id == tile1.id {
-                return TileData(id: tile.id, row: tile.row, col: tile.col, tileColor: tile2.tileColor, symbolIcon: tile2.symbolIcon, tileName: tile2.tileName)
+                return TileData(id: tile.id, row: tile.row, col: tile.col,
+                                tileColor: tile2.tileColor,
+                                symbolIcon: tile2.symbolIcon,
+                                tileName: tile2.tileName)
             } else if tile.id == tile2.id {
-                return TileData(id: tile.id, row: tile.row, col: tile.col, tileColor: tile1.tileColor, symbolIcon: tile1.symbolIcon, tileName: tile1.tileName)
+                return TileData(id: tile.id, row: tile.row, col: tile.col,
+                                tileColor: tile1.tileColor,
+                                symbolIcon: tile1.symbolIcon,
+                                tileName: tile1.tileName)
             }
             return tile
         }
@@ -773,60 +814,58 @@ struct GameplayView: View {
     func findAndClearMatches() {
         var matchedTiles: Set<String> = []
         
-        // Check horizontal
+        // Horizontal
         for row in 0..<BOARD_SIZE {
             for col in 0...(BOARD_SIZE - 3) {
                 let tiles = [
-                    gameBoard.first(where: { $0.row == row && $0.col == col })!,
-                    gameBoard.first(where: { $0.row == row && $0.col == col + 1 })!,
-                    gameBoard.first(where: { $0.row == row && $0.col == col + 2 })!
+                    gameBoard.first { $0.row == row && $0.col == col }!,
+                    gameBoard.first { $0.row == row && $0.col == col + 1 }!,
+                    gameBoard.first { $0.row == row && $0.col == col + 2 }!
                 ]
                 
-                if tiles[0].tileColor == tiles[1].tileColor && tiles[1].tileColor == tiles[2].tileColor {
-                    matchedTiles.insert(tiles[0].id)
-                    matchedTiles.insert(tiles[1].id)
-                    matchedTiles.insert(tiles[2].id)
+                if tiles[0].tileColor == tiles[1].tileColor &&
+                    tiles[1].tileColor == tiles[2].tileColor {
+                    tiles.forEach { matchedTiles.insert($0.id) }
                 }
             }
         }
         
-        // Check vertical
+        // Vertical
         for col in 0..<BOARD_SIZE {
             for row in 0...(BOARD_SIZE - 3) {
                 let tiles = [
-                    gameBoard.first(where: { $0.row == row && $0.col == col })!,
-                    gameBoard.first(where: { $0.row == row + 1 && $0.col == col })!,
-                    gameBoard.first(where: { $0.row == row + 2 && $0.col == col })!
+                    gameBoard.first { $0.row == row && $0.col == col }!,
+                    gameBoard.first { $0.row == row + 1 && $0.col == col }!,
+                    gameBoard.first { $0.row == row + 2 && $0.col == col }!
                 ]
                 
-                if tiles[0].tileColor == tiles[1].tileColor && tiles[1].tileColor == tiles[2].tileColor {
-                    matchedTiles.insert(tiles[0].id)
-                    matchedTiles.insert(tiles[1].id)
-                    matchedTiles.insert(tiles[2].id)
+                if tiles[0].tileColor == tiles[1].tileColor &&
+                    tiles[1].tileColor == tiles[2].tileColor {
+                    tiles.forEach { matchedTiles.insert($0.id) }
                 }
             }
         }
         
         if !matchedTiles.isEmpty {
-            let matchCount = matchedTiles.count / 3
-            let points = matchCount * 10
+            let matches = matchedTiles.count / 3
+            let points = matches * 10
             playerScore += points
             
             streakCounter += 1
             
+            feedbackText = streakCounter > 1
+            ? "🔥 \(streakCounter)x COMBO! +\(points + streakCounter * 5)"
+            : "✨ Match! +\(points) points!"
+            
             if streakCounter > 1 {
-                let bonusPoints = streakCounter * 5
-                playerScore += bonusPoints
-                feedbackText = "🔥 \(streakCounter)x COMBO! +\(points + bonusPoints) pts!"
-            } else {
-                feedbackText = "✨ Match! +\(points) points!"
+                playerScore += streakCounter * 5
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 refillTiles(Array(matchedTiles))
             }
         } else {
-            feedbackText = "No matches. Keep trying!"
+            feedbackText = "No matches. Try again!"
             streakCounter = 0
         }
     }
@@ -847,24 +886,21 @@ struct GameplayView: View {
             return tile
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             findAndClearMatches()
         }
     }
     
     func endGame() {
-        let newRecord = GameRecord(finalScore: playerScore)
-        recordManager.saveRecord(newRecord)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            displayGameOver = true
-        }
+        timerRunning = false
+        recordManager.saveRecord(GameRecord(finalScore: playerScore))
+        displayGameOver = true
     }
     
     func formatCountdown(_ time: TimeInterval) -> String {
-        let secs = Int(time)
+        let seconds = Int(time)
         let ms = Int((time.truncatingRemainder(dividingBy: 1)) * 100)
-        return String(format: "%02d.%02ds", secs, ms)
+        return String(format: "%02d.%02d", seconds, ms)
     }
 }
 
