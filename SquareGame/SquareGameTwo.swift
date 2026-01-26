@@ -147,6 +147,20 @@ struct LevelSelectionView: View {
     
     var body: some View {
         ZStack {
+            
+            // Background Gradient
+            LinearGradient(
+                colors: [
+                    Color(red: 0.1, green: 0.0, blue: 0.3),
+                    Color(red: 0.2, green: 0.0, blue: 0.4),
+                    Color(red: 0.3, green: 0.1, blue: 0.5)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            
         VStack(spacing: 30) {
                 // ===== ADD BACK BUTTON HERE =====
                                HStack {
@@ -155,7 +169,7 @@ struct LevelSelectionView: View {
                                    } label: {
                                        HStack {
                                            Image(systemName: "arrow.left")
-                                           Text("Back")
+                                           
                                        }
                                        .font(.headline)
                                        .foregroundColor(.purple)
@@ -184,7 +198,7 @@ struct LevelSelectionView: View {
                 
                 Text("Select Difficulty Level")
                     .font(.title3)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white)
                 
                 
                 // Level Buttons
@@ -319,8 +333,13 @@ struct HighScoreView: View {
     
     var body: some View {
         ZStack {
+            // Background Gradient
             LinearGradient(
-                colors: [Color.purple.opacity(0.2), Color.blue.opacity(0.2)],
+                colors: [
+                    Color(red: 0.1, green: 0.0, blue: 0.3),
+                    Color(red: 0.2, green: 0.0, blue: 0.4),
+                    Color(red: 0.3, green: 0.1, blue: 0.5)
+                ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -343,6 +362,7 @@ struct HighScoreView: View {
                     
                     Text("High Scores")
                         .font(.headline)
+                        .foregroundColor(.white)
                     
                     Spacer()
                     
@@ -362,6 +382,7 @@ struct HighScoreView: View {
                     ForEach(DifficultLevel.allCases, id: \.self) { level in
                         Text(level.rawValue).tag(level)
                     }
+                    
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding(.horizontal)
@@ -492,7 +513,11 @@ struct GameView: View {
         ZStack {
             
             LinearGradient(
-                colors: [Color.purple.opacity(0.2), Color.blue.opacity(0.2)],
+                colors: [
+                    Color(red: 0.1, green: 0.0, blue: 0.3),
+                    Color(red: 0.2, green: 0.0, blue: 0.4),
+                    Color(red: 0.3, green: 0.1, blue: 0.5)
+                ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -529,7 +554,7 @@ struct GameView: View {
                                     .foregroundColor(.blue)
                                 Text(formatTime(elapsedTime))
                                     .font(.system(size: 20, weight: .semibold, design: .monospaced))
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(.white)
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -546,13 +571,14 @@ struct GameView: View {
                         
                         // Title
                         Text("Tap Matching Colors")
-                            .font(.title2)
+                            .font(.title3)
+                            .foregroundColor(.white)
                             .bold()
                         
                         // Message
                         Text(message)
                             .font(.body)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.purple)
                             .multilineTextAlignment(.center)
                             .frame(height: 50)
                             .animation(.easeInOut, value: message)
