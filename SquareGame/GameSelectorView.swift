@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct GameSelectorView: View {
+    @AppStorage("username") private var username = ""
     @State private var selectedGame: SelectedGame? = nil
+
     
     enum SelectedGame {
         case colorMatch
@@ -18,21 +20,25 @@ struct GameSelectorView: View {
     
     var body: some View {
         NavigationStack {
-            if let game = selectedGame {
-                switch game {
-                case .colorMatch:
-                    SquareGameTwo(selectedGame: $selectedGame)
-                        .navigationBarHidden(true)
-                case .match3:
-                    Match3GameView()
-                        .navigationBarHidden(true)
+            Group {
+                if username.isEmpty {
+                    UsernameView()
+                } else if let game = selectedGame {
+                    switch game {
+                    case .colorMatch:
+                        SquareGameTwo(selectedGame: $selectedGame)
+                    case .match3:
+                        Match3GameView()
+                    }
+                } else {
+                    mainMenu
                 }
-            } else {
-                mainMenu
-                    .navigationBarHidden(true)
             }
         }
+        .id(username)
     }
+
+
     
     // ===== MAIN MENU =====
     var mainMenu: some View {

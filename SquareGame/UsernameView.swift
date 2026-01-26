@@ -11,7 +11,7 @@ import SwiftUI
 struct UsernameView: View {
     @AppStorage("username") var username: String = ""
     @State private var tempName = ""
-    @Binding var isCompleted: Bool
+    
     
     var body: some View {
         ZStack {
@@ -110,8 +110,10 @@ struct UsernameView: View {
                     
                     // Continue button
                     Button {
-                        username = tempName
-                        isCompleted = true
+                        if !tempName.trimmingCharacters(in: .whitespaces).isEmpty {
+                                username = tempName.trimmingCharacters(in: .whitespaces)
+                            }
+                       // isCompleted = true
                     } label: {
                         HStack(spacing: 12) {
                             Text("START GAME")
@@ -167,5 +169,5 @@ extension View {
 }
 
 #Preview {
-    UsernameView(isCompleted: .constant(false))
+    UsernameView()
 }
