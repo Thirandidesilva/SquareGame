@@ -38,7 +38,11 @@ struct GameSelectorView: View {
     var mainMenu: some View {
         ZStack {
             LinearGradient(
-                colors: [Color.indigo, Color.purple, Color.pink],
+                colors: [
+                    Color(red: 0.1, green: 0.0, blue: 0.3),
+                    Color(red: 0.2, green: 0.0, blue: 0.4),
+                    Color(red: 0.3, green: 0.1, blue: 0.5)
+                ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )

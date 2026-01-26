@@ -153,9 +153,9 @@ struct MainMenuView: View {
             // Background Gradient
             LinearGradient(
                 colors: [
-                    Color.pink.opacity(0.8),
-                    Color.purple.opacity(0.8),
-                    Color.indigo.opacity(0.9)
+                    Color(red: 0.1, green: 0.0, blue: 0.3),
+                    Color(red: 0.2, green: 0.0, blue: 0.4),
+                    Color(red: 0.3, green: 0.1, blue: 0.5)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -322,9 +322,9 @@ struct LeaderboardView: View {
             // Background
             LinearGradient(
                 colors: [
-                    Color.pink.opacity(0.8),
-                    Color.purple.opacity(0.8),
-                    Color.indigo.opacity(0.9)
+                    Color(red: 0.1, green: 0.0, blue: 0.3),
+                    Color(red: 0.2, green: 0.0, blue: 0.4),
+                    Color(red: 0.3, green: 0.1, blue: 0.5)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -520,9 +520,9 @@ struct GameplayView: View {
                 // Background
                 LinearGradient(
                     colors: [
-                        Color.pink.opacity(0.8),
-                        Color.purple.opacity(0.8),
-                        Color.indigo.opacity(0.9)
+                        Color(red: 0.1, green: 0.0, blue: 0.3),
+                        Color(red: 0.2, green: 0.0, blue: 0.4),
+                        Color(red: 0.3, green: 0.1, blue: 0.5)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
