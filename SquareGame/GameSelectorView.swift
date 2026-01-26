@@ -7,53 +7,43 @@
 
 import SwiftUI
 
-// MARK: - Game Selector View
-
-
 struct GameSelectorView: View {
     @State private var selectedGame: SelectedGame? = nil
     
-    /// Which game to show
     enum SelectedGame {
         case colorMatch
         case match3
     }
     
+    
     var body: some View {
-        // Use NavigationStack for proper navigation
         NavigationStack {
             if let game = selectedGame {
-                // Show selected game
                 switch game {
                 case .colorMatch:
                     SquareGameTwo(selectedGame: $selectedGame)
                         .navigationBarHidden(true)
                 case .match3:
                     Match3GameView()
-                            .navigationBarHidden(true)
+                        .navigationBarHidden(true)
                 }
             } else {
-                // Show game selector menu
                 mainMenu
                     .navigationBarHidden(true)
             }
         }
-    } 
+    }
     
     // ===== MAIN MENU =====
     var mainMenu: some View {
         ZStack {
-            // Background Gradient
             LinearGradient(
-                colors: [
-                    Color.indigo,
-                    Color.purple,
-                    Color.pink
-                ],
+                colors: [Color.indigo, Color.purple, Color.pink],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
+            .accessibilityHidden(true) // Decorative background
             
             VStack(spacing: 40) {
                 Spacer()
@@ -64,14 +54,18 @@ struct GameSelectorView: View {
                         .font(.system(size: 60, weight: .black))
                         .foregroundColor(.white)
                         .shadow(radius: 10)
+                        .accessibilityAddTraits(.isHeader)
+                        .accessibilityLabel("Game Hub")
                     
                     Text("Choose a game to play")
                         .font(.title2)
                         .foregroundColor(.white.opacity(0.9))
+                        .accessibilityLabel("Choose a game to play")
                 }
                 
                 Spacer()
                 
+        
                 // ===== BUTTONS =====
                 VStack(spacing: 20) {
                     
@@ -82,6 +76,8 @@ struct GameSelectorView: View {
                         HStack(spacing: 15) {
                             Image(systemName: "paintpalette.fill")
                                 .font(.system(size: 35))
+                                .accessibilityHidden(true)
+                            
                             Text("Color Match")
                                 .font(.system(size: 28, weight: .bold))
                         }
@@ -94,12 +90,16 @@ struct GameSelectorView: View {
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
-                        
                         )
                         .cornerRadius(25)
-                        .shadow(color: Color.purple.opacity(0.5), radius: 15, x: 0, y: 10)
+                        .shadow(color: Color.purple.opacity(0.5),
+                                radius: 15, x: 0, y: 10)
                     }
-                     
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Play Color Match")
+                    .accessibilityHint("Starts the Color Match game")
+                    .accessibilityAddTraits(.isButton)
+                    
                     // Match 3 Button
                     Button {
                         selectedGame = .match3
@@ -107,6 +107,8 @@ struct GameSelectorView: View {
                         HStack(spacing: 15) {
                             Image(systemName: "timer")
                                 .font(.system(size: 35))
+                                .accessibilityHidden(true)
+                            
                             Text("Match 3 Rush")
                                 .font(.system(size: 28, weight: .bold))
                         }
@@ -121,8 +123,13 @@ struct GameSelectorView: View {
                             )
                         )
                         .cornerRadius(25)
-                        .shadow(color: Color.pink.opacity(0.5), radius: 15, x: 0, y: 10)
+                        .shadow(color: Color.pink.opacity(0.5),
+                                radius: 15, x: 0, y: 10)
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Play Match 3 Rush")
+                    .accessibilityHint("Starts the Match 3 game")
+                    .accessibilityAddTraits(.isButton)
                 }
                 .padding(.horizontal, 30)
                 
@@ -131,8 +138,6 @@ struct GameSelectorView: View {
         }
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     GameSelectorView()
