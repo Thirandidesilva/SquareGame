@@ -9,9 +9,17 @@ import SwiftUI
 
 @main
 struct SquareGameApp: App {
+    @StateObject private var appState = AppState()
+    @AppStorage("username") private var username = ""
+
     var body: some Scene {
         WindowGroup {
-            UsernameView()
+            RootView()
+                .environmentObject(appState)
+                .onAppear {
+                    appState.hasUsername = !username.isEmpty
+                }
         }
     }
 }
+

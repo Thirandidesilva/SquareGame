@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct UsernameView: View {
+    @EnvironmentObject var appState: AppState
     @AppStorage("username") var username: String = ""
     @State private var tempName = ""
     
@@ -110,10 +111,11 @@ struct UsernameView: View {
                     
                     // Continue button
                     Button {
-                        if !tempName.trimmingCharacters(in: .whitespaces).isEmpty {
-                                username = tempName.trimmingCharacters(in: .whitespaces)
-                            }
-                       // isCompleted = true
+                        let name = tempName.trimmingCharacters(in: .whitespaces)
+                        if !name.isEmpty {
+                            username = name
+                            appState.hasUsername = true   // THIS IS THE KEY
+                        }
                     } label: {
                         HStack(spacing: 12) {
                             Text("START GAME")
@@ -170,4 +172,6 @@ extension View {
 
 #Preview {
     UsernameView()
+        .environmentObject(AppState())
 }
+
