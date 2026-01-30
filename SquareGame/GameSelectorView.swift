@@ -12,6 +12,7 @@ struct GameSelectorView: View {
     @AppStorage("username") private var username = ""
 
     @State private var selectedGame: SelectedGame? = nil
+    @State private var showLogoutAlert = false   //Alertstate
 
     enum SelectedGame {
         case colorMatch
@@ -51,14 +52,20 @@ struct GameSelectorView: View {
 
             VStack(spacing: 40) {
 
-        // LOGOUT / CHANGE PLAYER BUTTON (TOP RIGHT)
+                // ===== TOP BAR =====
                 HStack {
+                    // PLAYER NAME
+                    Text("Player: \(username)")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding(.leading, 20)
+                        .accessibilityLabel("Current player \(username)")
+
                     Spacer()
 
+                    // LOGOUT BUTTON
                     Button {
-                        // Logout action
-                        username = ""
-                        appState.hasUsername = false
+                        showLogoutAlert = true
                     } label: {
                         Image(systemName: "person.crop.circle.badge.xmark")
                             .font(.system(size: 22))
@@ -75,8 +82,8 @@ struct GameSelectorView: View {
                             )
                             .shadow(radius: 6)
                     }
-                    .accessibilityLabel("Change player")
-                    .accessibilityHint("Logs out and returns to player setup")
+                    .accessibilityLabel("Logout")
+                    .accessibilityHint("Logs out and changes player")
                     .padding(.trailing, 20)
                 }
                 .padding(.top, 20)
@@ -101,7 +108,7 @@ struct GameSelectorView: View {
                 // ===== GAME BUTTONS =====
                 VStack(spacing: 25) {
 
-                    // Color Match Button
+                    // Color Match
                     Button {
                         selectedGame = .colorMatch
                     } label: {
@@ -127,10 +134,8 @@ struct GameSelectorView: View {
                         .shadow(color: Color.purple.opacity(0.5),
                                 radius: 15, x: 0, y: 10)
                     }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel("Play Color Match")
 
-                    // Match 3 Button
+                    // Match 3
                     Button {
                         selectedGame = .match3
                     } label: {
@@ -156,14 +161,23 @@ struct GameSelectorView: View {
                         .shadow(color: Color.pink.opacity(0.5),
                                 radius: 15, x: 0, y: 10)
                     }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel("Play Match 3 Rush")
                 }
-                .padding(.bottom,70)
+                .padding(.bottom,50)
                 .padding(.horizontal, 30)
 
                 Spacer()
             }
+        }
+        //  LOGOUT CONFIRMATION ALERT
+        .alert("Logout", isPresented: $showLogoutAlert) {
+            Button("Cancel", role: .cancel) {}
+
+            Button("Logout", role: .destructive) {
+                username = ""
+                appState.hasUsername = false
+            }
+        } message: {
+            Text("Are you sure you want to change the player?")
         }
     }
 }
