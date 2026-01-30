@@ -144,7 +144,7 @@ struct GameSelectorView: View {
                                 .font(.system(size: 35))
                                 .accessibilityHidden(true)
 
-                            Text("Match 3 Rush")
+                            Text("60 Second Rush")
                                 .font(.system(size: 28, weight: .bold))
                         }
                         .foregroundColor(.white)
