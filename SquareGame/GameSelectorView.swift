@@ -8,16 +8,16 @@
 import SwiftUI
 
 struct GameSelectorView: View {
-    //@AppStorage("username") private var username = ""
+    @EnvironmentObject var appState: AppState
+    @AppStorage("username") private var username = ""
+
     @State private var selectedGame: SelectedGame? = nil
 
-    
     enum SelectedGame {
         case colorMatch
         case match3
     }
-    
-    
+
     var body: some View {
         NavigationStack {
             if let game = selectedGame {
@@ -33,10 +33,10 @@ struct GameSelectorView: View {
         }
     }
 
-    
     // ===== MAIN MENU =====
     var mainMenu: some View {
         ZStack {
+            // Background
             LinearGradient(
                 colors: [
                     Color(red: 0.1, green: 0.0, blue: 0.3),
@@ -47,11 +47,42 @@ struct GameSelectorView: View {
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
-            .accessibilityHidden(true) // Decorative background
-            
+            .accessibilityHidden(true)
+
             VStack(spacing: 40) {
-                Spacer()
-                
+
+        // LOGOUT / CHANGE PLAYER BUTTON (TOP RIGHT)
+                HStack {
+                    Spacer()
+
+                    Button {
+                        // Logout action
+                        username = ""
+                        appState.hasUsername = false
+                    } label: {
+                        Image(systemName: "person.crop.circle.badge.xmark")
+                            .font(.system(size: 22))
+                            .foregroundColor(.white)
+                            .padding(10)
+                            .background(
+                                Circle().fill(
+                                    LinearGradient(
+                                        colors: [.red, .pink],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                            )
+                            .shadow(radius: 6)
+                    }
+                    .accessibilityLabel("Change player")
+                    .accessibilityHint("Logs out and returns to player setup")
+                    .padding(.trailing, 20)
+                }
+                .padding(.top, 20)
+
+               // Spacer()
+
                 // ===== TITLE =====
                 VStack(spacing: 15) {
                     Text("Game Hub")
@@ -59,20 +90,17 @@ struct GameSelectorView: View {
                         .foregroundColor(.white)
                         .shadow(radius: 10)
                         .accessibilityAddTraits(.isHeader)
-                        .accessibilityLabel("Game Hub")
-                    
+
                     Text("Choose a game to play")
                         .font(.title2)
                         .foregroundColor(.white.opacity(0.9))
-                        .accessibilityLabel("Choose a game to play")
                 }
-                
+
                 Spacer()
-                
-        
-                // ===== BUTTONS =====
-                VStack(spacing: 20) {
-                    
+
+                // ===== GAME BUTTONS =====
+                VStack(spacing: 25) {
+
                     // Color Match Button
                     Button {
                         selectedGame = .colorMatch
@@ -81,7 +109,7 @@ struct GameSelectorView: View {
                             Image(systemName: "paintpalette.fill")
                                 .font(.system(size: 35))
                                 .accessibilityHidden(true)
-                            
+
                             Text("Color Match")
                                 .font(.system(size: 28, weight: .bold))
                         }
@@ -101,9 +129,7 @@ struct GameSelectorView: View {
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("Play Color Match")
-                    .accessibilityHint("Starts the Color Match game")
-                    .accessibilityAddTraits(.isButton)
-                    
+
                     // Match 3 Button
                     Button {
                         selectedGame = .match3
@@ -112,7 +138,7 @@ struct GameSelectorView: View {
                             Image(systemName: "timer")
                                 .font(.system(size: 35))
                                 .accessibilityHidden(true)
-                            
+
                             Text("Match 3 Rush")
                                 .font(.system(size: 28, weight: .bold))
                         }
@@ -132,11 +158,10 @@ struct GameSelectorView: View {
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("Play Match 3 Rush")
-                    .accessibilityHint("Starts the Match 3 game")
-                    .accessibilityAddTraits(.isButton)
                 }
+                .padding(.bottom,70)
                 .padding(.horizontal, 30)
-                
+
                 Spacer()
             }
         }
@@ -145,4 +170,5 @@ struct GameSelectorView: View {
 
 #Preview {
     GameSelectorView()
+        .environmentObject(AppState())
 }
